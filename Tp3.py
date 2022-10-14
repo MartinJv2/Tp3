@@ -1,37 +1,71 @@
+"""
+Fait par : Jeremy Martin Groupe : 403
+Ce code represente un combat entre le joueur et des monstres
+"""
+
 from random import randint
 
-vies_joueur, victoires, defaites, jouer = 20, 0, 0, True
+rejouer = True
+
 
 def restart():
-    vies_joueur, victoires, defaites = 20, 0, 0
-
-
-def creer_monstre():
-    print("")
-
+    """
+	Cette definition reset les variables et redit la scene
+	"""
+    global vies_joueur, victoires, defaites, streak
+    vies_joueur, victoires, defaites, streak = 20, 0, 0, 0
+    regles = input(
+        "Vous etes dans une grotte de goblins. Vous essayez de survivre le plus longtemps possible en tuant des "
+        "monstre qui vous attaquent. \n\n(Entrez 1 pour voir les regles)\nEntrez quelque chose d'autre pour "
+        "continuer\n\n")
+    if regles == "1":
+        input(
+            "Pour réussir un combat, il faut que la valeur du dé lancé soit supérieure à la force de l’adversaire.  "
+            "Dans ce cas, le nivea de vie de l’usager est augmenté de la force de l’adversaire. Une défaite a lieu "
+            "lorsque la valeur du dé lancé par l’usager est inférieure ou égale à la force de l’adversaire.  Dans ce "
+            "cas, le niveau de vie de l’usager est diminué de la force de l’adversaire. La partie se termine lorsque "
+            "les points de vie de l’usager tombent sous 0. L’usager peut combattre ou éviter chaque adversaire, "
+            "dans le cas de l’évitement, il y a une pénalité de 1 point de vie.\nEntrez quelque chose pour "
+            "continuer\n\n")
 
 
 def fight():
-    fight=True
-    while fight:
-        global vies_joueur, victoires, defaites, jouer
-        vies_monstre = randint(1, 5)
-        combattre = int(input(f"Un monstre apparait avec {vies_monstre} vies. Que voulez vous faire. \n\n1-Attaquer\n\n2-Contourner"))
+    """
+	Cette definition fait le combat entre le joueur et le monstre
+	"""
+    fighting = True
+    while fighting:
+        global vies_joueur, victoires, defaites, rejouer, streak
+        if streak >= 3:
+            vies_monstre, boss = randint(8, 12), "ATTAQUE DU BOSS!!"
+        else:
+            vies_monstre, boss = randint(4, 8), ""
+        combattre = int(input(
+            f"Vies : {vies_joueur}\nVictoires : {victoires}\nDefaites : {defaites}\nStreak : {streak}\n\n "
+            f"Monstre de {vies_monstre} vies (monstre #{victoires + defaites + 1}) : {boss}\n\n1-Attaquer\n\n2"
+            f"-Contourner\n\n"))
         if combattre == 1:
-            dees = randint(1, 6)
+            dees = (randint(1, 6) + randint(1, 6))
             if dees > vies_monstre:
-                vies_joueur, victoires, rejouer = vies_joueur + vies_monstre, victoires+1, int(input("Voulez vous rejouer?\n\n1-Rejouer\n\n2-Arreter"))
+                vies_joueur, victoires, streak = vies_joueur + vies_monstre, victoires + 1, streak + 1
+                print(f"VICTOIRE\nVous avez roulee un {dees}\n\n")
             else:
-                vies_joueur, defaites, rejouer = vies_joueur - vies_monstre, defaites+1, int(input("Voulez vous rejouer?\n\n1-Rejouer\n\n2-Arreter"))
-                if vies_joueur<=0:
-                    fight=False
+                print(f"VOUS AVEZ PERDU\nVous avez roulee un {dees}\n\n")
+                vies_joueur, defaites, streak = vies_joueur - vies_monstre, defaites + 1, 0
+                if vies_joueur <= 0:
+                    fighting = False
+                    print(f"VOUS ETES MORT\n\nStats :\nVies : 0\nVictoires : {victoires}\nDefaites : {defaites}")
+                    rejouer = int(input("Voulez vous rejouer?\n\n1-Rejouer\n\n2-Arreter"))
 
         else:
             vies_joueur -= 1
-            if vies_joueur<=0:
-                fight=False
+            if vies_joueur <= 0:
+                fighting = False
+                print(f"VOUS ETES MORT\n\nStats :\nVies : 0\nVictoires : {victoires}\nDefaites : {defaites}")
+                rejouer = int(input("Voulez vous rejouer?\n\n1-Rejouer\n\n2-Arreter"))
 
-while jouer:
+
+while rejouer != 2:
     restart()
-    creer_monstre()
     fight()
+print("Merci et au revoir...")
